@@ -1,0 +1,7 @@
+pytest
+pytest-cov
+coverage
+coveralls
+sphinx>=2.1
+recommonmark
+sphinx_rtd_theme

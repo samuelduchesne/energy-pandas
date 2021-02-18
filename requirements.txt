@@ -1,0 +1,8 @@
+outdated
+pint
+tabulate
+numpy
+matplotlib>=3.2  # because of TwoSlopesNorm
+scikit-learn
+tsam
+pandas==1.2.2  # becausklearnse of io.common methods
