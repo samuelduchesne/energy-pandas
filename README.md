@@ -4,10 +4,7 @@
 
 # energy-pandas
 
-A python scripting language for TRNSYS.
-
-Create .dck files from stratch in an object-oriented python structure. Add components,
-specify parameters, connect components together and more throught python code.
+An extension of pandas to deal with building related time series such as temperature, load and energy.
 
 ## Installation
 
