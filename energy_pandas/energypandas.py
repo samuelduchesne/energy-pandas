@@ -718,7 +718,9 @@ class EnergySeries(Series):
                 f"{RESOLUTION_NAME[yperiod.resolution_string][0:-1]}"
             )
 
-        stacked, timeindex = tsam.unstackToPeriods(copy.deepcopy(self), periodlength)
+        stacked, timeindex = tsam.unstackToPeriods(
+            copy.deepcopy(self), int(periodlength)
+        )
         if xlabel is None:
             xperiod = (periodlength * offset).delta
             xlabel = f"{RESOLUTION_NAME[xperiod.resolution_string]}"
