@@ -1,6 +1,7 @@
 """EnergySeries module."""
 
 import copy
+import logging
 import warnings
 from datetime import timedelta
 
@@ -13,8 +14,10 @@ from pandas import (
     MultiIndex,
     Series,
     date_range,
+    infer_freq,
     pivot_table,
     to_datetime,
+    to_timedelta,
 )
 from pandas._libs.tslibs.offsets import to_offset
 from pandas.core.generic import NDFrame
@@ -29,8 +32,6 @@ from .plotting import (
     _setup_subplots,
     save_and_show,
 )
-
-import logging
 from .units import unit_registry
 
 log = logging.getLogger(__name__)
@@ -641,14 +642,14 @@ class EnergySeries(Series):
 
     def plot2d(
         self,
-        periodlength=24,
+        periodlength=None,
         vmin=None,
         vmax=None,
         vcenter=None,
         axis_off=True,
         cmap="RdBu",
         fig_height=None,
-        fig_width=6,
+        fig_width=8,
         show=True,
         save=False,
         close=False,
@@ -658,6 +659,8 @@ class EnergySeries(Series):
         ax=None,
         filename="untitled",
         extent="tight",
+        ylabel=None,
+        xlabel=None,
     ):
         """
         Args:
@@ -682,6 +685,8 @@ class EnergySeries(Series):
             ax:
             filename:
             extent:
+            ylabel (str): Set the label for the y-axis.
+            xlabel (str): Set the label for the x-axis.
         """
         if fig_height is None:
             fig_height = fig_width / 3
@@ -698,14 +703,32 @@ class EnergySeries(Series):
                 fig.set_size_inches(figsize)
             axes = ax
 
+        freq = infer_freq(self.index[0:3])  # infer on first 3.
+        offset = to_offset(freq)
+
+        if periodlength is None:
+            periodlength = 24 * 1 / (to_timedelta(offset).seconds / 3600)
+
+        if ylabel is None:
+            yperiod = (periodlength * offset).delta
+
+            offset_n = f"{offset.n}-" if offset.n > 1 else ""
+            ylabel = (
+                f"{offset_n}{RESOLUTION_NAME[offset.name]} of "
+                f"{RESOLUTION_NAME[yperiod.resolution_string][0:-1]}"
+            )
+
         stacked, timeindex = tsam.unstackToPeriods(copy.deepcopy(self), periodlength)
+        if xlabel is None:
+            xperiod = (periodlength * offset).delta
+            xlabel = f"{RESOLUTION_NAME[xperiod.resolution_string]}"
         cmap = plt.get_cmap(cmap)
         if vcenter is not None:
             norm = TwoSlopeNorm(vcenter, vmin=vmin, vmax=vmax)
         else:
             norm = None
         im = axes.imshow(
-            stacked.values.T,
+            stacked.T,
             interpolation="nearest",
             vmin=vmin,
             vmax=vmax,
@@ -713,9 +736,12 @@ class EnergySeries(Series):
             norm=norm,
         )
         axes.set_aspect("auto")
-        axes.set_ylabel("Hour of day")
-        axes.set_xlabel("Day of year")
-        axes.set_title(f"{self.name}")
+        axes.set_ylabel(ylabel)
+        axes.set_xlabel(xlabel)
+
+        ax_title = f"{self.name}" if self.name is not None else None
+        if ax_title:
+            axes.set_title(ax_title)
 
         # fig.subplots_adjust(right=1.1)
         cbar = fig.colorbar(im, ax=axes)
@@ -726,6 +752,17 @@ class EnergySeries(Series):
         )
 
         return fig, axes
+
+
+RESOLUTION_NAME = dict(
+    D="Days",
+    H="Hours",
+    T="Minutes",
+    S="Seconds",
+    L="Milliseconds",
+    U="Microseconds",
+    N="Nanoseconds",
+)
 
 
 class EnergyDataFrame(DataFrame):
@@ -995,11 +1032,6 @@ class EnergyDataFrame(DataFrame):
             subplots, nseries, sharex, sharey, figsize, ax, layout, layout_type
         )
         cols = self.columns
-        if periodlength is None:
-            import pandas as pd
-
-            freq = pd.infer_freq(self.index[0:3])  # infer on first 3.
-            periodlength = 24 * 1 / (pd.to_timedelta(to_offset(freq)).seconds / 3600)
         for ax, col in zip(axes, cols):
             self[col].plot2d(
                 periodlength=periodlength,

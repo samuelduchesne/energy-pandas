@@ -229,12 +229,20 @@ class TestEnergyDataFrame:
         # check that the type is maintained
         assert type(edf_from_e_series) == EnergyDataFrame
 
-    def test_plot_2d(self, edf_from_e_series):
-        fig, ax = edf_from_e_series.plot2d(
+    def test_plot_2d(self):
+        """Test plot2d with resolution higher than hours."""
+        import numpy as np
+
+        es = EnergySeries(
+            np.random.randint(12, 36, size=(365 * 24 * 4,)),
+            index=date_range("2018-01-01", periods=365 * 24 * 4, freq="15T"),
+            units="degC",
+        )
+        fig, ax = es.plot2d(
             axis_off=False,
             cmap="Reds",
             fig_height=None,
-            fig_width=6,
+            fig_width=8,
             show=True,
             save=True,
             extent="tight",
