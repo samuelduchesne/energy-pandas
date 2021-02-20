@@ -17,7 +17,16 @@ log = logger.info
 
 
 def save_and_show(
-    fig, ax, save, show, close, filename, file_format, dpi, axis_off, extent
+    fig,
+    ax=None,
+    save=False,
+    show=True,
+    close=False,
+    filename="untitled",
+    file_format="png",
+    dpi=300,
+    axis_off=False,
+    extent="extent",
 ):
     """Save a figure to disk and show it, as specified.
 
@@ -34,19 +43,20 @@ def save_and_show(
         dpi (int): the resolution of the image file if saving (Dots per inch)
         axis_off (bool): if True matplotlib axis was turned off by plot_graph so
             constrain the saved figure's extent to the interior of the axis
-        extent:
+        extent (str or `.Bbox`): Bounding box in inches: only the given portion of
+            the figure is saved.  If 'tight', try to figure out the tight bbox of
+            the figure.
 
     Returns:
-        (tuple) fig, ax
+        tuple: fig, ax
     """
-    # save the figure if specified
-
     if save:
         start_time = time.time()
 
         # create the save folder if it doesn't already exist
         path_filename = os.path.join(os.extsep.join([filename, file_format]))
-
+        if ax is None:
+            ax = fig.get_axes()
         if not isinstance(ax, (ndarray, list)):
             ax = [ax]
         if file_format == "svg":
