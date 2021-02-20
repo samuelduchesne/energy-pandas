@@ -61,9 +61,6 @@ def save_and_show(
             ax = [ax]
         if file_format == "svg":
             for ax in ax:
-                # if the file_format is svg, prep the fig/ax a bit for saving
-                ax.axis("off")
-                ax.set_position([0, 0, 1, 1])
                 ax.patch.set_alpha(0.0)
             fig.patch.set_alpha(0.0)
             fig.savefig(
