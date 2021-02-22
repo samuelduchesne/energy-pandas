@@ -618,6 +618,7 @@ class EnergySeries(Series):
 
     @property
     def time_at_min(self):
+        """Return the index value where the min occurs."""
         return self.idxmin()
 
     @property
@@ -775,7 +776,7 @@ class EnergyDataFrame(DataFrame):
 
     Data structure also contains labeled axes (rows and columns). Arithmetic
     operations align on both row and column labels. Can be thought of as a
-    dict-like container for Series objects. The primary energypandas data structure.
+    dict-like container for Series objects. The primary energy-pandas data structure.
 
     """
 
