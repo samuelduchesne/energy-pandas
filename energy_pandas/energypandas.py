@@ -201,7 +201,7 @@ class EnergySeries(Series):
         return es
 
     @property
-    def units(self) -> dict or Unit:
+    def units(self) -> Quantity:
         return self._units
 
     @units.setter
@@ -301,13 +301,13 @@ class EnergySeries(Series):
             to_units (str, pint.Unit):
             inplace:
         """
-        cdata = unit_registry.Quantity(self.values, self.units).to(to_units).m
+        cdata = unit_registry.Quantity(self.values, self.units).to(to_units)
         if inplace:
-            self[:] = cdata
-            self.units = to_units
+            self[:] = cdata.m
+            self.units = cdata.units
         else:
             # create new instance using constructor
-            result = self._constructor(data=cdata, index=self.index, copy=False)
+            result = self._constructor(data=cdata.m, index=self.index, copy=False)
             # Copy metadata over
             result.__finalize__(self)
             result.units = to_units
@@ -640,6 +640,22 @@ class EnergySeries(Series):
             return 1
         else:
             return self.data.shape[1]
+
+    def to_si(self):
+        """Convert self to SI units."""
+        _, si_units = unit_registry._get_base_units(self.units, system="SI")
+        self.to_units(si_units, inplace=True)
+        return self
+
+    def to_ip(self):
+        """Convert self to US units (inch-pound)."""
+        _, ip_units = unit_registry._get_base_units(self.units, system="US")
+        self.to_units(ip_units, inplace=True)
+        return self
+
+    def to_compact(self):
+        """Make unit more human_readable"""
+        self.to_compact()
 
     def plot2d(
         self,

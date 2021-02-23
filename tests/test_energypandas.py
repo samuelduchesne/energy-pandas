@@ -80,6 +80,16 @@ class TestEnergySeries:
         es.to_units(to_units="kelvin", inplace=True)
         assert es.equals(original + 273.15)
 
+    def test_units_SI_system(self, es):
+        """test unit conversion."""
+        es.units = "W"
+        print(es.to_si().units)
+
+    def test_units_IP_system(self, es):
+        """test unit conversion."""
+        es.units = "W"
+        print(es.to_ip().units)
+
     def test_units_ops(self, edf_from_e_series):
         a = edf_from_e_series["Series 1 degC"]
         b = edf_from_e_series["Series 2 degK"]
