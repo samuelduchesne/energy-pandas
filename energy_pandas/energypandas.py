@@ -299,7 +299,7 @@ class EnergySeries(Series):
 
         Args:
             to_units (str, pint.Unit):
-            inplace:
+            inplace (bool): If True, conversion is applied inplace.
         """
         cdata = unit_registry.Quantity(self.values, self.units).to(to_units)
         if inplace:
@@ -641,22 +641,30 @@ class EnergySeries(Series):
         else:
             return self.data.shape[1]
 
-    def to_si(self):
-        """Convert self to SI units."""
+    def to_si(self, inplace=False):
+        """Convert self to SI units.
+
+        Args:
+            inplace (bool): If True, conversion is applied inplace.
+        """
         try:
             si_units = SI_DEFAULT_CONVERSION[self.units]
         except KeyError:
             return self
-        self.to_units(si_units, inplace=True)
+        self.to_units(si_units, inplace=inplace)
         return self
 
-    def to_ip(self):
-        """Convert self to IP units (inch-pound)."""
+    def to_ip(self, inplace=False):
+        """Convert self to IP units (inch-pound).
+
+        Args:
+            inplace (bool): If True, conversion is applied inplace.
+        """
         try:
             ip_units = IP_DEFAULT_CONVERSION[self.units]
         except KeyError:
             return self
-        self.to_units(ip_units, inplace=True)
+        self.to_units(ip_units, inplace=inplace)
         return self
 
     def plot2d(
