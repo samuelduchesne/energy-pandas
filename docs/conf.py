@@ -95,10 +95,6 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "pandas": ("http://pandas.pydata.org/pandas-docs/stable/", None),
     "numpy": ("https://docs.scipy.org/doc/numpy/", None),
-    "networkx": (
-        "https://networkx.github.io/documentation/stable" "/index" ".html",
-        "https://networkx.github.io/objects.inv",
-    ),
     "pint": ("https://pint.readthedocs.io/en/0.9/", None),
     "path": ("https://pathpy.readthedocs.io/en/stable/", None),
     "sympy": ("https://docs.sympy.org/latest/", None),

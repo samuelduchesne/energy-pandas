@@ -1,5 +1,5 @@
 energy-pandas |version|
-======================
+=======================
 
 .. include:: ../README.rst
 

@@ -6,6 +6,9 @@ from tokenize import TokenInfo
 import pint
 from pint.compat import tokenizer
 
+import pkg_resources
+energyplus_registry = pkg_resources.resource_filename(__name__, "energyplus_en.txt")
+
 
 def underline_dash(input_string):
     """Enclose denominator with parentheses."""
@@ -36,9 +39,7 @@ class Token:
 
 
 unit_registry = pint.UnitRegistry(preprocessors=[underline_dash, dash_to_mul])
-unit_registry.load_definitions(
-    "energy_pandas/energyplus_en.txt",
-)
+unit_registry.load_definitions(energyplus_registry)
 pint.set_application_registry(unit_registry)
 
 
