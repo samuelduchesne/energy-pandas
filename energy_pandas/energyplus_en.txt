@@ -1,0 +1,50 @@
+# Default EnergyPlus units definition file
+# Based on input-output-reference/idd-conventions
+# Language: english
+# :copyright: 2020 by Samuel Letellier-Duchesne
+
+h = 1 * hour
+m3 = 1 * meter ** 3 = m³
+ft3 = 1 * feet ** 3 = ft³
+ft2 = 1 * feet ** 2 = ft²
+m2 = 1 * meter ** 2 = m²
+inch2 = 1 * inch ** 2 = inch²
+
+# Aliases
+@alias inch = in
+@alias lb = lbm
+@alias delta_degree_Fahrenheit = deltaF
+@alias delta_degreeC = deltaC
+@alias degree_Fahrenheit = F
+@alias degree_Rankine = R
+@alias degree_Kelvin = K
+@alias ton_of_refrigeration = ton
+@alias hour = h
+
+# In EnergyPlus, exponents appear without any indication of exponentiation: i.e., kg/m3 not kg/m^3 or kg/m**3
+m3 = 1 * meter ** 3 = m³
+ft3 = 1 * feet ** 3 = ft³
+ft2 = 1 * feet ** 2 = ft²
+m2 = 1 * meter ** 2 = m²
+inch2 = 1 * inch ** 2 = inch²
+K2 = 1 * degree_Kelvin ** 2 = K²
+K3 = 1 * degree_Kelvin ** 3 = K³
+F2 = 1 * degree_Fahrenheit ** 2 = F²
+F3 = 1 * degree_Fahrenheit ** 3 = F³
+s2 = 1 * second ** 2 = s²
+
+# person
+person = _
+
+#percent
+percent = 0.01 * count = %
+
+# Other units
+ach = dimensionless  # Air Changes per Hour
+acr = 1 / hour  # Air change rate
+kBtuh = 1000 * Btu * hour
+footcandle = 1 * lumen / ft2 = fc = ft-c
+ton-hrs = 1 * ton_of_refrigeration * hour
+
+# override
+degree_Celsius = kelvin; offset: 273.15 = °C = celsius = degC = degreeC = C  # necessary to override Coulomb C

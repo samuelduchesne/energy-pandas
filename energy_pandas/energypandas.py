@@ -32,7 +32,7 @@ from .plotting import (
     _setup_subplots,
     save_and_show,
 )
-from .units import unit_registry
+from .units import unit_registry, IP_DEFAULT_CONVERSION, SI_DEFAULT_CONVERSION
 
 log = logging.getLogger(__name__)
 
@@ -201,7 +201,7 @@ class EnergySeries(Series):
         return es
 
     @property
-    def units(self) -> dict or Unit:
+    def units(self) -> Quantity:
         return self._units
 
     @units.setter
@@ -299,15 +299,15 @@ class EnergySeries(Series):
 
         Args:
             to_units (str, pint.Unit):
-            inplace:
+            inplace (bool): If True, conversion is applied inplace.
         """
-        cdata = unit_registry.Quantity(self.values, self.units).to(to_units).m
+        cdata = unit_registry.Quantity(self.values, self.units).to(to_units)
         if inplace:
-            self[:] = cdata
-            self.units = to_units
+            self[:] = cdata.m
+            self.units = cdata.units
         else:
             # create new instance using constructor
-            result = self._constructor(data=cdata, index=self.index, copy=False)
+            result = self._constructor(data=cdata.m, index=self.index, copy=False)
             # Copy metadata over
             result.__finalize__(self)
             result.units = to_units
@@ -618,6 +618,7 @@ class EnergySeries(Series):
 
     @property
     def time_at_min(self):
+        """Return the index value where the min occurs."""
         return self.idxmin()
 
     @property
@@ -639,6 +640,32 @@ class EnergySeries(Series):
             return 1
         else:
             return self.data.shape[1]
+
+    def to_si(self, inplace=False):
+        """Convert self to SI units.
+
+        Args:
+            inplace (bool): If True, conversion is applied inplace.
+        """
+        try:
+            si_units = SI_DEFAULT_CONVERSION[self.units]
+        except KeyError:
+            return self
+        self.to_units(si_units, inplace=inplace)
+        return self
+
+    def to_ip(self, inplace=False):
+        """Convert self to IP units (inch-pound).
+
+        Args:
+            inplace (bool): If True, conversion is applied inplace.
+        """
+        try:
+            ip_units = IP_DEFAULT_CONVERSION[self.units]
+        except KeyError:
+            return self
+        self.to_units(ip_units, inplace=inplace)
+        return self
 
     def plot2d(
         self,
@@ -775,7 +802,7 @@ class EnergyDataFrame(DataFrame):
 
     Data structure also contains labeled axes (rows and columns). Arithmetic
     operations align on both row and column labels. Can be thought of as a
-    dict-like container for Series objects. The primary energypandas data structure.
+    dict-like container for Series objects. The primary energy-pandas data structure.
 
     """
 
