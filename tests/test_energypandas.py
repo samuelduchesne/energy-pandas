@@ -1,9 +1,11 @@
 import pytest
 from numpy.testing import assert_almost_equal
 from pandas import date_range, read_csv
+from pint import Unit, Quantity
+
 from energy_pandas import EnergyDataFrame, EnergySeries
 from energy_pandas.edf_utils import MultipleUnitsError
-from energy_pandas.units import unit_registry
+from energy_pandas.units import unit_registry, dash_to_mul, underline_dash
 
 
 @pytest.fixture()
@@ -257,3 +259,75 @@ class TestEnergyDataFrame:
             save=True,
             extent="tight",
         )
+
+
+class TestUnits:
+
+    # (Quantity, unit, abbreviation)
+    ENERGYPLUS_UNITS = [
+        ("angular degrees", "degree", "deg"),
+        ("Length", "meter", "m"),
+        ("Area", "square meter", "m2"),
+        ("Volume", "cubic meter", "m3"),
+        ("Time", "seconds", "s"),
+        ("Frequency", "Hertz", "Hz"),
+        ("Temperature", "Celsius", "C"),
+        ("absolute temperature", "Kelvin", "K"),
+        ("temperature difference", "Kelvin", "deltaC"),
+        ("speed", "meters per second", "m/s"),
+        ("energy (or work)", "Joules", "J"),
+        ("power", "Watts", "W"),
+        ("mass", "kilograms", "kg"),
+        ("force", "Newton", "N"),
+        ("mass flow", "kilograms per second", "kg/s"),
+        ("volume flow", "cubic meters per second", "m3/s"),
+        ("pressure", "Pascals", "Pa"),
+        ("pressure difference", "Pascals", "Pa"),
+        ("specific enthalpy", "Joules per kilogram", "J/kg"),
+        ("density", "kilograms per cubic meter", "kg/m3"),
+        ("heat flux", "watts per square meter", "W/m2"),
+        ("specific heat", "——-", "J/kg-K"),
+        ("conductivity", "——-", "W/m-K"),
+        ("diffusivity", "——-", "m2/s"),
+        ("heat transfer coefficient", "——-", "W/m2-K"),
+        ("R-value", "——-", "m2-K/W"),
+        ("heating or cooling capacity", "Watts", "W"),
+        ("electric potential", "volts", "V"),
+        ("electric current", "Amperes", "A"),
+        ("illuminace", "lux", "lx"),
+        ("luminous flux", "lumen", "lm"),
+        ("luminous intensity", "candelas", "cd"),
+        ("luminance", "candelas per square meter", "cd/m2"),
+        ("vapor diffusivity", "meters squared per second", "m2/s"),
+        ("viscosity", "——-", "kg/m-s"),
+        ("dynamic Viscosity", "——-", "N-s/m2"),
+        ("thermal gradient coeff for moisture capacity", "——-", "kg/kg-K"),
+        ("isothermal moisture capacity", "——-", "m3/kg"),
+    ]
+    ENERGYPLUS_UNITS_NAMES = [unit for _, _, unit in ENERGYPLUS_UNITS]
+
+    def test_underline_dash(self):
+        assert underline_dash("W/m-K") == "W/(m-K)"
+
+    def test_dash_to_mul(self):
+        assert dash_to_mul("W/m-K") == "W/m*K"
+
+    @pytest.mark.parametrize("units", ENERGYPLUS_UNITS, ids=ENERGYPLUS_UNITS_NAMES)
+    def test_unit_registry(self, units):
+        quantity, unit, abbreviation = units
+        parsed_units = unit_registry.parse_units(abbreviation)
+        print(f"{parsed_units:~P}")
+        assert parsed_units
+
+    @pytest.mark.parametrize("units", ENERGYPLUS_UNITS, ids=ENERGYPLUS_UNITS_NAMES)
+    def test_to_ip(self, units):
+        """Test conversion to ip_units"""
+        quantity, unit, abbreviation = units
+        es = EnergySeries(range(0, 10), units=abbreviation)
+        print(f"{es.to_ip().units}")
+
+    @pytest.mark.parametrize("units", ENERGYPLUS_UNITS, ids=ENERGYPLUS_UNITS_NAMES)
+    def test_to_si(self, units):
+        quantity, unit, abbreviation = units
+        es = EnergySeries(range(0, 10), units=abbreviation)
+        print(f"{es.to_si().units}")

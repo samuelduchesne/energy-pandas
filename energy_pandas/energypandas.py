@@ -32,7 +32,7 @@ from .plotting import (
     _setup_subplots,
     save_and_show,
 )
-from .units import unit_registry
+from .units import unit_registry, IP_DEFAULT_CONVERSION, SI_DEFAULT_CONVERSION
 
 log = logging.getLogger(__name__)
 
@@ -643,19 +643,21 @@ class EnergySeries(Series):
 
     def to_si(self):
         """Convert self to SI units."""
-        _, si_units = unit_registry._get_base_units(self.units, system="SI")
+        try:
+            si_units = SI_DEFAULT_CONVERSION[self.units]
+        except KeyError:
+            return self
         self.to_units(si_units, inplace=True)
         return self
 
     def to_ip(self):
-        """Convert self to US units (inch-pound)."""
-        _, ip_units = unit_registry._get_base_units(self.units, system="US")
+        """Convert self to IP units (inch-pound)."""
+        try:
+            ip_units = IP_DEFAULT_CONVERSION[self.units]
+        except KeyError:
+            return self
         self.to_units(ip_units, inplace=True)
         return self
-
-    def to_compact(self):
-        """Make unit more human_readable"""
-        self.to_compact()
 
     def plot2d(
         self,
