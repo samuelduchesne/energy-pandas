@@ -110,7 +110,8 @@ class EnergySeries(Series):
         )
         self.bin_edges_ = None
         self.bin_scaling_factors_ = None
-        self.units = units
+
+        self._set_units(units)
 
         for k, v in kwargs.items():
             EnergySeries._metadata.append(k)
@@ -125,7 +126,7 @@ class EnergySeries(Series):
             for name in other._metadata:
                 if name == "units":
                     if isinstance(other, EnergyDataFrame):
-                        setattr(self, name, getattr(other, "_units").get(self.name))
+                        setattr(self, name, getattr(other, "units").get(self.name))
                     else:
                         setattr(self, name, getattr(other, "units"))
                 elif name == "name":
@@ -200,18 +201,14 @@ class EnergySeries(Series):
         es.index = newindex
         return es
 
-    @property
-    def units(self) -> Quantity:
-        return self._units
-
-    @units.setter
-    def units(self, value):
+    def _set_units(self, value):
+        """Set units on self."""
         if isinstance(value, str):
-            self._units = unit_registry.parse_expression(value).units
+            self.units = unit_registry.parse_expression(value).units
         elif isinstance(value, (Unit, Quantity)):
-            self._units = value
+            self.units = value
         elif value is None:
-            self._units = unit_registry.parse_expression(value).units
+            self.units = unit_registry.parse_expression(value).units
         else:
             raise TypeError(f"Unit of type {type(value)}")
 
@@ -304,13 +301,13 @@ class EnergySeries(Series):
         cdata = unit_registry.Quantity(self.values, self.units).to(to_units)
         if inplace:
             self[:] = cdata.m
-            self.units = cdata.units
+            self._set_units(cdata.units)
         else:
             # create new instance using constructor
             result = self._constructor(data=cdata.m, index=self.index, copy=False)
             # Copy metadata over
             result.__finalize__(self)
-            result.units = to_units
+            result._set_units(to_units)
             return result
 
     def normalize(self, inplace=False):
@@ -447,8 +444,8 @@ class EnergySeries(Series):
         """
         if energy_series.empty:
             warnings.warn(
-                "The EnergyProgile you are attempting to plot is "
-                "empty. Nothing has been displayed.",
+                "The EnergySeries you are attempting to plot is empty. "
+                "Nothing has been displayed.",
                 UserWarning,
             )
             return axes
@@ -841,14 +838,14 @@ class EnergyDataFrame(DataFrame):
         )
 
         # prepare units dict; holds series units.
-        self._units = {}
+        self.units = {}
         if isinstance(data, (dict, DataFrame)):
             # for each series, setattr `units` defined in each items or for whole df.
             for name, col in data.items():
                 # ndarray (structured or homogeneous), Iterable, dict, or DataFrame
-                self._units[name] = getattr(col, "units", self._parse_units(units))
+                self.units[name] = getattr(col, "units", self._parse_units(units))
         elif isinstance(data, EnergySeries):
-            self._units[data.name] = data.units
+            self.units[data.name] = data.units
 
         # for each extra kwargs, set as metadata of self.
         for k, v in kwargs.items():
@@ -933,14 +930,6 @@ class EnergyDataFrame(DataFrame):
             edf.sort_values(sort_values, inplace=True)
         return edf
 
-    @property
-    def units(self):
-        return self._units
-
-    @units.setter
-    def units(self, value):
-        self._units = value
-
     def _parse_units(self, value):
         if isinstance(value, str):
             return unit_registry.parse_expression(value).units
@@ -976,7 +965,7 @@ class EnergyDataFrame(DataFrame):
         )
         if inplace:
             self[:] = cdata.values
-            self._units = {col: u for col, u in zip(self.columns, cdata.units.values())}
+            self.units = {col: u for col, u in zip(self.columns, cdata.units.values())}
         else:
             # create new instance using constructor
             result = self._constructor(
@@ -984,7 +973,7 @@ class EnergyDataFrame(DataFrame):
             )
             # Copy metadata over
             result.__finalize__(self)
-            result._units = {
+            result.units = {
                 col: u for col, u in zip(self.columns, cdata.units.values())
             }
             return result
@@ -997,7 +986,7 @@ class EnergyDataFrame(DataFrame):
             # replace whole data with array
             self[:] = x_scaled
             # change units to dimensionless
-            self._units = {name: unit_registry.dimensionless for name in self.columns}
+            self.units = {name: unit_registry.dimensionless for name in self.columns}
         else:
             # create new instance using constructor
             result = self._constructor(
