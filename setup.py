@@ -2,7 +2,6 @@
 # Always prefer setuptools over distutils
 import codecs
 import os
-import re
 from os import path
 
 from setuptools import find_packages, setup
@@ -13,14 +12,6 @@ here = os.getcwd()
 def read(*parts):
     with codecs.open(path.join(here, *parts), "r") as fp:
         return fp.read()
-
-
-def find_version(*file_paths):
-    version_file = read(*file_paths)
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError("Unable to find version string.")
 
 
 # Get the long description from the README file
@@ -38,7 +29,8 @@ dev_requires = [r.strip() for r in requirements_lines]
 package = "energy-pandas"
 setup(
     name=package,
-    version=find_version("energy_pandas", "__init__.py"),
+    use_scm_version=True,
+    setup_requires=["setuptools_scm"],
     packages=find_packages(exclude=["tests"]),
     url="https://github.com/samuelduchesne/{}".format(package),
     license="MIT",
