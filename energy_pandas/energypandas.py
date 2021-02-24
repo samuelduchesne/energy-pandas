@@ -957,6 +957,19 @@ class EnergyDataFrame(DataFrame):
         Args:
             to_units (str or pint.Unit):
             inplace (bool): If True, conversion is applied inplace.
+
+        Examples:
+            >>> import energy_pandas as epd
+            >>> edf = epd .EnergyDataFrame(
+            >>>         {
+            >>>             "Series 1": epd.EnergySeries(range(0, 8760), units="degC"),
+            >>>             "Series 2": epd.EnergySeries(range(0, 8760), units="degK"),
+            >>>             "Series 3": epd.EnergySeries(range(0, 8760), units="degR"),
+            >>>         },
+            >>> )
+            >>> edf.to_units("degC").units
+            {'Series 1': <Unit('degree_Celsius')>, 'Series 2': <Unit('degree_Celsius')>, 'Series 3': <Unit('degree_Celsius')>}
+
         """
         cdata = self.apply(
             lambda col: unit_registry.Quantity(col.values, col.units).to(to_units)
