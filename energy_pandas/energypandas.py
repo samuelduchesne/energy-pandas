@@ -952,28 +952,28 @@ class EnergyDataFrame(DataFrame):
             raise TypeError(f"Unit of type {type(value)}")
 
     def to_units(self, to_units=None, inplace=False):
-        """returns the multiplier to convert units
+        """Returns the multiplier to convert units.
 
         Args:
             to_units (str or pint.Unit):
-            inplace:
+            inplace (bool): If True, conversion is applied inplace.
         """
-        if len(set(self.units.values())) > 1:
-            raise MultipleUnitsError
-        else:
-            units = next(iter(set(self.units.values())))
-        cdata = unit_registry.Quantity(self.values, units).to(to_units)
+        cdata = self.apply(
+            lambda col: unit_registry.Quantity(col.values, col.units).to(to_units)
+        )
         if inplace:
-            self[:] = cdata.m
-            self._units = {name: cdata.units for name in self.columns}
+            self[:] = cdata.values
+            self._units = {col: u for col, u in zip(self.columns, cdata.units.values())}
         else:
             # create new instance using constructor
             result = self._constructor(
-                data=cdata.m, index=self.index, columns=self.columns, copy=False
+                data=cdata, index=self.index, columns=self.columns, copy=False
             )
             # Copy metadata over
             result.__finalize__(self)
-            result._units = {name: cdata.units for name in self.columns}
+            result._units = {
+                col: u for col, u in zip(self.columns, cdata.units.values())
+            }
             return result
 
     def normalize(self, inplace=False):

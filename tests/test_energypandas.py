@@ -189,8 +189,12 @@ class TestEnergyDataFrame:
         assert edf_from_e_series[["Series 1 degC"]].units == {
             "Series 1 degC": unit_registry.degC
         }
-        with pytest.raises(MultipleUnitsError):
-            edf_from_e_series.to_units("degF")
+
+    def test_mixed_units_convert(self, edf_from_e_series):
+        assert edf_from_e_series.to_units("degR").units == {
+            "Series 1 degC": unit_registry.degR,
+            "Series 2 degK": unit_registry.degR
+        }
 
     def test_units_value(self, edf):
         """test unit conversion."""
