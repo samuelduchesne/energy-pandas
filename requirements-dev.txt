@@ -1,7 +1,7 @@
-pytest
-pytest-cov
-coverage
-coveralls
+pytest==6.2.2
+pytest-cov==2.11.1
+coverage==5.4
+coveralls==3.0.0
 sphinx>=2.1
-recommonmark
-sphinx_rtd_theme
+recommonmark==0.7.1
+sphinx_rtd_theme==0.5.1
