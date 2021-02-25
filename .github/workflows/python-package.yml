@@ -45,4 +45,13 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.xml
         fail_ci_if_error: false
-        verbose: true 
+        verbose: true
+        
+  changelog:
+    name: Generate changelog
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Generate changelog
+      uses: heinrichreimer/action-github-changelog-generator@v2.2
+
