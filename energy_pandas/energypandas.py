@@ -111,11 +111,28 @@ class EnergySeries(Series):
         self.bin_edges_ = None
         self.bin_scaling_factors_ = None
 
-        self._set_units(units)
+        self.__set_units(units)
 
         for k, v in kwargs.items():
             EnergySeries._metadata.append(k)
             setattr(EnergySeries, k, v)
+
+    def __get_units(self):
+        """Get units for self."""
+        return self._units
+
+    def __set_units(self, value):
+        """Set units on self."""
+        if isinstance(value, str):
+            self._units = unit_registry.parse_expression(value).units
+        elif isinstance(value, (Unit, Quantity)):
+            self._units = value
+        elif value is None:
+            self._units = unit_registry.parse_expression(value).units
+        else:
+            raise TypeError(f"Unit of type {type(value)}")
+
+    units = property(__get_units, __set_units)
 
     def __finalize__(self, other, method=None, **kwargs):
         """Propagate metadata from other to self."""
@@ -200,17 +217,6 @@ class EnergySeries(Series):
         newindex = date_range(start=start_date, freq=frequency, periods=len(es))
         es.index = newindex
         return es
-
-    def _set_units(self, value):
-        """Set units on self."""
-        if isinstance(value, str):
-            self.units = unit_registry.parse_expression(value).units
-        elif isinstance(value, (Unit, Quantity)):
-            self.units = value
-        elif value is None:
-            self.units = unit_registry.parse_expression(value).units
-        else:
-            raise TypeError(f"Unit of type {type(value)}")
 
     @classmethod
     def from_reportdata(
@@ -301,13 +307,13 @@ class EnergySeries(Series):
         cdata = unit_registry.Quantity(self.values, self.units).to(to_units)
         if inplace:
             self[:] = cdata.m
-            self._set_units(cdata.units)
+            self.__set_units(cdata.units)
         else:
             # create new instance using constructor
             result = self._constructor(data=cdata.m, index=self.index, copy=False)
             # Copy metadata over
             result.__finalize__(self)
-            result._set_units(to_units)
+            result.__set_units(to_units)
             return result
 
     def normalize(self, inplace=False):
