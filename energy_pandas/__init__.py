@@ -7,7 +7,7 @@ from pkg_resources import get_distribution, DistributionNotFound
 
 # Version of the package
 try:
-    __version__ = get_distribution("archetypal").version
+    __version__ = get_distribution("energy-pandas").version
 except DistributionNotFound:
     # package is not installed
     __version__ = "0.0.0"  # should happen only if package is copied, not installed.
