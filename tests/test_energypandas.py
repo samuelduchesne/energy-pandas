@@ -1,10 +1,8 @@
 import pytest
 from numpy.testing import assert_almost_equal
-from pandas import date_range, read_csv
-from pint import Unit, Quantity
+from pandas import date_range
 
 from energy_pandas import EnergyDataFrame, EnergySeries
-from energy_pandas.edf_utils import MultipleUnitsError
 from energy_pandas.units import unit_registry, dash_to_mul, underline_dash
 
 
@@ -67,6 +65,10 @@ class TestEnergySeries:
         es.to_units(to_units="degF", inplace=True)
         assert es.units == unit_registry.degF
         assert type(es) == EnergySeries
+
+        #set attribute
+        es.units = "degC"
+        assert es.units == unit_registry.degC
 
     def test_meta_ops(self, es):
         """Operations keep units."""
