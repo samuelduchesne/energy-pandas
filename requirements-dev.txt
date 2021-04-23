@@ -4,4 +4,4 @@ coverage==5.5
 coveralls==3.0.1
 sphinx>=2.1
 recommonmark==0.7.1
-sphinx_rtd_theme==0.5.1
+sphinx_rtd_theme==0.5.2
