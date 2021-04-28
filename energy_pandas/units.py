@@ -4,9 +4,9 @@
 from tokenize import TokenInfo
 
 import pint
+import pkg_resources
 from pint.compat import tokenizer
 
-import pkg_resources
 energyplus_registry = pkg_resources.resource_filename(__name__, "energyplus_en.txt")
 
 

@@ -3,7 +3,7 @@ from numpy.testing import assert_almost_equal
 from pandas import date_range
 
 from energy_pandas import EnergyDataFrame, EnergySeries
-from energy_pandas.units import unit_registry, dash_to_mul, underline_dash
+from energy_pandas.units import dash_to_mul, underline_dash, unit_registry
 
 
 @pytest.fixture()
@@ -66,7 +66,7 @@ class TestEnergySeries:
         assert es.units == unit_registry.degF
         assert type(es) == EnergySeries
 
-        #set attribute
+        # set attribute
         es.units = "degC"
         assert es.units == unit_registry.degC
 
@@ -201,7 +201,7 @@ class TestEnergyDataFrame:
     def test_mixed_units_convert(self, edf_from_e_series):
         assert edf_from_e_series.to_units("degR").units == {
             "Series 1 degC": unit_registry.degR,
-            "Series 2 degK": unit_registry.degR
+            "Series 2 degK": unit_registry.degR,
         }
 
     def test_units_value(self, edf):

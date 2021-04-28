@@ -32,7 +32,7 @@ from .plotting import (
     _setup_subplots,
     save_and_show,
 )
-from .units import unit_registry, IP_DEFAULT_CONVERSION, SI_DEFAULT_CONVERSION
+from .units import IP_DEFAULT_CONVERSION, SI_DEFAULT_CONVERSION, unit_registry
 
 log = logging.getLogger(__name__)
 
