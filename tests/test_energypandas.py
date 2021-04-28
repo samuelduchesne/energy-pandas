@@ -192,6 +192,12 @@ class TestEnergyDataFrame:
             "Series 1 degC": unit_registry.degC
         }
 
+    def test_mixed_units_ops(self, edf_from_e_series):
+        col_1 = edf_from_e_series.iloc[:, 0]
+        col_2 = edf_from_e_series.iloc[:, 1]
+        # todo: deal with mixed units magnitude
+        assert (col_1 * col_2).units == "degree_Celsius"
+
     def test_mixed_units_convert(self, edf_from_e_series):
         assert edf_from_e_series.to_units("degR").units == {
             "Series 1 degC": unit_registry.degR,
@@ -234,6 +240,10 @@ class TestEnergyDataFrame:
 
         # check that the slice keeps the units
         assert edf.units == {"Temp": edf["Temp"].units}
+
+    def test_numeric_operations(self, edf):
+        assert edf.mean(axis=1).units == "degree_Celsius"
+        assert edf.sum(axis=1).units == "degree_Celsius"
 
     def test_repr(self, edf):
         # check that a slice returns an EnergySeries
