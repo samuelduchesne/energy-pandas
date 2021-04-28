@@ -3,7 +3,7 @@ from numpy.testing import assert_almost_equal
 from pandas import date_range
 
 from energy_pandas import EnergyDataFrame, EnergySeries
-from energy_pandas.units import unit_registry, dash_to_mul, underline_dash
+from energy_pandas.units import dash_to_mul, underline_dash, unit_registry
 
 
 @pytest.fixture()
@@ -66,7 +66,7 @@ class TestEnergySeries:
         assert es.units == unit_registry.degF
         assert type(es) == EnergySeries
 
-        #set attribute
+        # set attribute
         es.units = "degC"
         assert es.units == unit_registry.degC
 
@@ -192,10 +192,16 @@ class TestEnergyDataFrame:
             "Series 1 degC": unit_registry.degC
         }
 
+    def test_mixed_units_ops(self, edf_from_e_series):
+        col_1 = edf_from_e_series.iloc[:, 0]
+        col_2 = edf_from_e_series.iloc[:, 1]
+        # todo: deal with mixed units magnitude
+        assert (col_1 * col_2).units == "degree_Celsius"
+
     def test_mixed_units_convert(self, edf_from_e_series):
         assert edf_from_e_series.to_units("degR").units == {
             "Series 1 degC": unit_registry.degR,
-            "Series 2 degK": unit_registry.degR
+            "Series 2 degK": unit_registry.degR,
         }
 
     def test_units_value(self, edf):
@@ -234,6 +240,10 @@ class TestEnergyDataFrame:
 
         # check that the slice keeps the units
         assert edf.units == {"Temp": edf["Temp"].units}
+
+    def test_numeric_operations(self, edf):
+        assert edf.mean(axis=1).units == "degree_Celsius"
+        assert edf.sum(axis=1).units == "degree_Celsius"
 
     def test_repr(self, edf):
         # check that a slice returns an EnergySeries

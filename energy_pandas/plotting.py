@@ -1,5 +1,6 @@
 """Plotting module."""
 
+import logging
 import os
 import time
 
@@ -9,8 +10,6 @@ from matplotlib.colors import LightSource
 from numpy import ndarray
 from numpy.core._asarray import asarray
 from pandas.plotting._matplotlib.tools import create_subplots, flatten_axes
-
-import logging
 
 logger = logging.getLogger(__name__)
 log = logger.info

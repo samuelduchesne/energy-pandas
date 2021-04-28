@@ -32,7 +32,7 @@ from .plotting import (
     _setup_subplots,
     save_and_show,
 )
-from .units import unit_registry, IP_DEFAULT_CONVERSION, SI_DEFAULT_CONVERSION
+from .units import IP_DEFAULT_CONVERSION, SI_DEFAULT_CONVERSION, unit_registry
 
 log = logging.getLogger(__name__)
 
@@ -143,7 +143,11 @@ class EnergySeries(Series):
             for name in other._metadata:
                 if name == "units":
                     if isinstance(other, EnergyDataFrame):
-                        setattr(self, name, getattr(other, "units").get(self.name))
+                        if len(set(getattr(other, "units").values())) == 1:
+                            # if all the same units
+                            setattr(self, name, *set(getattr(other, "units").values()))
+                        else:
+                            setattr(self, name, getattr(other, "units").get(self.name))
                     else:
                         setattr(self, name, getattr(other, "units"))
                 elif name == "name":

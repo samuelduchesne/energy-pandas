@@ -1,9 +1,9 @@
 """energy-pandas Module."""
 
 from outdated import warn_if_outdated
+from pkg_resources import DistributionNotFound, get_distribution
 
-from .energypandas import EnergySeries, EnergyDataFrame
-from pkg_resources import get_distribution, DistributionNotFound
+from .energypandas import EnergyDataFrame, EnergySeries
 
 # Version of the package
 try:
