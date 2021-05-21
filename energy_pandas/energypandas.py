@@ -25,7 +25,6 @@ from pint import Quantity, Unit
 from sklearn import preprocessing
 from tsam import timeseriesaggregation as tsam
 
-from .edf_utils import MultipleUnitsError
 from .plotting import (
     _plot_poly_collection,
     _plot_surface,
@@ -408,51 +407,56 @@ class EnergySeries(Series):
             return result
 
     def plot3d(
-        energy_series,
+        self,
         kind="polygon",
         axis_off=True,
         cmap=None,
-        fig_height=None,
-        fig_width=6,
+        figsize=None,
         show=True,
         view_angle=-60,
         save=False,
         close=False,
         dpi=300,
         file_format="png",
-        color=None,
         axes=None,
         vmin=None,
         vmax=None,
         filename=None,
-        timeStepsPerPeriod=24,
+        time_steps_per_period=24,
         **kwargs,
     ):
-        """
+        """Plot a 3D plot of the data.
 
         Args:
-            energy_series (EnergySeries):
-            kind (str):
-            axis_off (bool):
-            cmap:
-            fig_height (float):
-            fig_width (float):
-            show (bool):
-            view_angle (float):
-            save (bool):
-            close (bool):
-            dpi (int):
-            file_format (str):
-            color (str):
-            axes:
-            vmin (float):
-            vmax (float):
-            filename (str):
-            timeStepsPerPeriod (int): The number of discrete timesteps which
+            kind (str): One of "polygon", "surface" or "contour".
+            axis_off (bool): If True, no axis is plotted.
+            cmap (str or Colormap): Colormap to select colors from. If string,
+                load colormap with that name from matplotlib.
+            figsize (tuple): Size of a figure object. A tuple (width, height) in inches.
+            show (bool): whether to display the figure or not.
+            view_angle (float): The angle view angle of the 3D plot.
+            save (bool): whether to save the figure to disk or not.
+            close (bool): close the figure (only if show equals False) to prevent
+                display.
+            dpi (int): the resolution of the image file if saving (Dots per inch)
+            file_format (string): the format of the file to save (e.g., 'jpg',
+                'png', 'svg').
+            axes (Axes): An axes of the current figure.
+            vmin (float): The data value that defines ``0.0`` in the normalization.
+                Defaults to the min value of the dataset.
+            vmax (float): The data value that defines ``1.0`` in the normalization.
+            filename (string): the name of the file to save.
+            time_steps_per_period (int): The number of discrete timesteps which
                 describe one period.
             **kwargs:
+
+        Returns:
+            (tuple): tuple containing:
+
+                fig: is the Matplotlib Figure object
+                ax: a single axis object.
         """
-        if energy_series.empty:
+        if self.empty:
             warnings.warn(
                 "The EnergySeries you are attempting to plot is empty. "
                 "Nothing has been displayed.",
@@ -465,22 +469,19 @@ class EnergySeries(Series):
         # noinspection PyUnresolvedReferences
         from mpl_toolkits.mplot3d import Axes3D
 
-        if isinstance(energy_series.index, MultiIndex):
-            groups = energy_series.groupby(level=0)
+        if isinstance(self.index, MultiIndex):
+            groups = self.groupby(level=0)
             nax = len(groups)
         else:
             nax = 1
-            groups = [("unnamed", energy_series)]
-
-        if fig_height is None:
-            fig_height = fig_width * nax
+            groups = [("unnamed", self)]
 
         # Set up plot
         fig, axes = plt.subplots(
             nax,
             1,
             subplot_kw=dict(projection="3d"),
-            figsize=(fig_width, fig_height),
+            figsize=figsize,
             dpi=dpi,
         )
         if not isinstance(axes, ndarray):
@@ -496,7 +497,7 @@ class EnergySeries(Series):
                 import tsam.timeseriesaggregation as tsam
 
                 z, _ = tsam.unstackToPeriods(
-                    profile, timeStepsPerPeriod=timeStepsPerPeriod
+                    profile, timeStepsPerPeriod=time_steps_per_period
                 )
                 nrows, ncols = z.shape
 
@@ -512,16 +513,16 @@ class EnergySeries(Series):
                     ax,
                     verts,
                     zs,
+                    cmap=cmap,
                     edgecolors=kwargs.get("edgecolors", None),
                     facecolors=kwargs.get("facecolors", None),
                     linewidths=kwargs.get("linewidths", None),
-                    cmap=cmap,
                 )
             elif kind == "surface":
                 import tsam.timeseriesaggregation as tsam
 
                 z, _ = tsam.unstackToPeriods(
-                    profile, timeStepsPerPeriod=timeStepsPerPeriod
+                    profile, timeStepsPerPeriod=time_steps_per_period
                 )
                 nrows, ncols = z.shape
                 x = z.columns
@@ -533,7 +534,7 @@ class EnergySeries(Series):
                 import tsam.timeseriesaggregation as tsam
 
                 z, _ = tsam.unstackToPeriods(
-                    profile, timeStepsPerPeriod=timeStepsPerPeriod
+                    profile, timeStepsPerPeriod=time_steps_per_period
                 )
                 nrows, ncols = z.shape
                 x = z.columns
@@ -554,8 +555,8 @@ class EnergySeries(Series):
             ax.set_ylabel(kwargs.get("ylabel", "day of year"))
             ax.set_zlim3d(vmin, vmax)
             z_label = "{} [{:~P}]".format(
-                energy_series.name if energy_series.name is not None else "Z",
-                energy_series.units,
+                self.name if self.name is not None else "Z",
+                self.units,
             )
             ax.set_zlabel(z_label)
 
@@ -682,55 +683,64 @@ class EnergySeries(Series):
         vcenter=None,
         axis_off=True,
         cmap="RdBu",
-        fig_height=None,
-        fig_width=8,
+        figsize=None,
         show=True,
         save=False,
         close=False,
         dpi=300,
         file_format="png",
-        color=None,
+        colorbar=None,
         ax=None,
         filename="untitled",
         extent="tight",
-        ylabel=None,
         xlabel=None,
+        ylabel=None,
+        ax_title=None,
+        **kwargs,
     ):
-        """
+        """Plot rectangular data as a color-encoded 2d-matrix.
+
         Args:
-            vcenter:
-            periodlength:
+            periodlength (int): The period length to show on the yaxis. By default,
+                the period length will be calculated to represent one day of data on
+                the yaxis and days on the xaxis.
             vmin (float): The data value that defines ``0.0`` in the normalization.
                 Defaults to the min value of the dataset.
             vmax (float): The data value that defines ``1.0`` in the normalization.
                 Defaults to the the max value of the dataset.
             vcenter (float): The data value that defines ``0.5`` in the
-            normalization.
-            axis_off:
-            cmap:
-            fig_height:
-            fig_width:
-            show:
-            save:
-            close:
-            dpi:
-            file_format:
-            color:
-            ax:
-            filename:
-            extent:
+                normalization.
+            axis_off (bool): If True, no axis is plotted.
+            cmap (str or Colormap): Colormap to select colors from. If string,
+                load colormap with that name from matplotlib.
+            figsize (tuple): Size of a figure object. A tuple (width, height) in inches.
+            show (bool): whether to display the figure or not.
+            save (bool): whether to save the figure to disk or not.
+            close (bool): close the figure (only if show equals False) to prevent
+                display.
+            dpi (int): the resolution of the image file if saving (Dots per inch)
+            file_format (string): the format of the file to save (e.g., 'jpg',
+                'png', 'svg').
+            colorbar (bool): If True, plot the colorbar.
+            ax (Axes): An axes of the current figure.
+            filename (string): the name of the file to save.
+            extent (str or `.Bbox`): Bounding box in inches: only the given portion of
+                the figure is saved.  If 'tight', try to figure out the tight bbox of
+                the figure.
             ylabel (str): Set the label for the y-axis.
             xlabel (str): Set the label for the x-axis.
-        """
-        if fig_height is None:
-            fig_height = fig_width / 3
-        figsize = (fig_width, fig_height)
+            ax_title (str): Title to use for the ax.
+            **kwargs: Options to pass to matplotlib imshow method.
 
+        Returns:
+            (tuple): tuple containing:
+
+                fig: is the Matplotlib Figure object
+                ax: a single axis object.
+        """
         if not ax:
             n = 1
-            fig, axes = plt.subplots(
-                nrows=n, ncols=1, figsize=(fig_width, fig_height), dpi=dpi
-            )
+            fig, axes = plt.subplots(nrows=n, ncols=1, figsize=figsize, dpi=dpi)
         else:
             fig = ax.get_figure()
             if figsize is not None:
@@ -770,18 +780,25 @@ class EnergySeries(Series):
             vmax=vmax,
             cmap=cmap,
             norm=norm,
+            **kwargs,
         )
         axes.set_aspect("auto")
         axes.set_ylabel(ylabel)
         axes.set_xlabel(xlabel)
 
-        ax_title = f"{self.name}" if self.name is not None else None
+        if axis_off:
+            axes.set_axis_off()
+
+        # If True or string set ax_title.
         if ax_title:
+            if not isinstance(ax_title, str):
+                ax_title = f"{self.name}" if self.name is not None else None
             axes.set_title(ax_title)
 
-        # fig.subplots_adjust(right=1.1)
-        cbar = fig.colorbar(im, ax=axes)
-        cbar.set_label(f"[{self.units:~P}]")
+        # add colorbar
+        if colorbar is True:
+            cbar = fig.colorbar(im, ax=axes)
+            cbar.set_label(f"[{self.units:~P}]")
 
         fig, axes = save_and_show(
             fig, axes, save, show, close, filename, file_format, dpi, axis_off, extent
@@ -1008,21 +1025,20 @@ class EnergyDataFrame(DataFrame):
 
     def plot2d(
         self,
-        periodlength=None,
         subplots=False,
+        periodlength=None,
         vmin=None,
         vmax=None,
+        vcenter=None,
         axis_off=True,
         cmap="RdBu",
-        fig_height=None,
-        fig_width=8,
+        figsize=None,
         show=True,
-        view_angle=-60,
         save=False,
         close=False,
         dpi=300,
         file_format="png",
-        color=None,
+        colorbar=None,
         ax=None,
         filename="untitled",
         extent="tight",
@@ -1033,61 +1049,71 @@ class EnergyDataFrame(DataFrame):
         fig_title=None,
         **kwargs,
     ):
-        """Plot a
+        """Plot rectangular data as a (or multiple) color-encoded 2d-matrix.
 
         Args:
-            self (EnergyDataFrame):
-            periodlength ():
-            subplots:
-            vmin:
-            vmax:
-            axis_off:
-            cmap:
-            fig_height:
-            fig_width:
-            show:
-            view_angle:
-            save:
-            close:
-            dpi:
-            file_format:
-            color:
-            ax:
-            filename:
-            extent:
-            sharex:
-            sharey:
-            layout:
-            layout_type:
-            fig_title:
-            **kwargs:
+            subplots (bool): If true, each column will be plotted as a separate subplot.
+            periodlength (int): The period length to show on the yaxis. By default,
+                the period length will be calculated to represent one day of data on
+                the yaxis and days on the xaxis.
+            vmin (float): The data value that defines ``0.0`` in the normalization.
+                Defaults to the min value of the dataset.
+            vmax (float): The data value that defines ``1.0`` in the normalization.
+                Defaults to the the max value of the dataset.
+            vcenter (float): The data value that defines ``0.5`` in the
+                normalization.
+            axis_off (bool): If True, no axis is plotted.
+            cmap (str or Colormap): Colormap to select colors from. If string,
+                load colormap with that name from matplotlib.
+            figsize (tuple): Size of a figure object. A tuple (width, height) in inches.
+            show (bool): whether to display the figure or not.
+            save (bool): whether to save the figure to disk or not.
+            close (bool): close the figure (only if show equals False) to prevent
+                display.
+            dpi (int): the resolution of the image file if saving (Dots per inch)
+            file_format (string): the format of the file to save (e.g., 'jpg',
+                'png', 'svg').
+            colorbar (bool): If True, plot the colorbar.
+            ax (Axes): An axes of the current figure.
+            filename (string): the name of the file to save.
+            extent (str or `.Bbox`): Bounding box in inches: only the given portion of
+                the figure is saved.  If 'tight', try to figure out the tight bbox of
+                the figure.
+            sharex (bool): If True, the X axis will be shared amongst all subplots.
+            sharey (bool): If True, the Y axis will be shared amongst all subplots.
+            layout (tuple): Number of rows and columns of the subplot grid. If not
+                specified, calculated from naxes and layout_type.
+            layout_type (str): {'box', 'horizontal', 'vertical'}, default 'box'
+                Specify how to layout the subplot grid.
+            fig_title (str): The title of the figure.
+            **kwargs: Options to pass to matplotlib plotting method.
 
         Returns:
+            (tuple): tuple containing:
 
+                fig: is the Matplotlib Figure object
+                ax: can be either a single axis object or an array of axis objects if
+                    more than one subplot was created.
         """
         nseries = self.nseries
-        if fig_height is None:
-            fig_height = fig_width / 3 * nseries
-        figsize = (fig_width, fig_height)
         fig, axes = _setup_subplots(
             subplots, nseries, sharex, sharey, figsize, ax, layout, layout_type
         )
         cols = self.columns
         for ax, col in zip(axes, cols):
-            self[col].plot2d(
+            self.loc[:, col].plot2d(
                 periodlength=periodlength,
                 vmin=vmin,
                 vmax=vmax,
+                vcenter=vcenter,
                 axis_off=axis_off,
                 cmap=cmap,
-                fig_height=fig_height,
-                fig_width=fig_width,
                 show=False,
                 save=False,
                 close=False,
                 dpi=dpi,
                 file_format=file_format,
-                color=color,
+                colorbar=colorbar,
                 ax=ax,
                 filename=filename,
                 extent=extent,

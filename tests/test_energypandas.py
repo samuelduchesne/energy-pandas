@@ -142,25 +142,23 @@ class TestEnergySeries:
     @pytest.mark.parametrize("kind", ["polygon", "surface", "contour"])
     def test_plot_3d(self, es, kind):
         fig, ax = es.plot3d(
-            save=True,
-            show=True,
-            axis_off=False,
             kind=kind,
+            axis_off=False,
             cmap="Reds",
-            fig_width=4,
-            fig_height=4,
+            show=True,
+            save=True,
             edgecolors="grey",
             linewidths=0.01,
         )
 
     def test_plot_2d(self, es):
         fig, ax = es.plot2d(
-            axis_off=False,
+            figsize=(8, 1),
+            axis_off=True,
             cmap="Reds",
-            fig_height=2,
-            fig_width=6,
             show=True,
-            save=True,
+            save=False,
+            colorbar=True,
             filename=es.name + "_heatmap",
         )
 
@@ -267,13 +265,7 @@ class TestEnergyDataFrame:
             units="degC",
         )
         fig, ax = es.plot2d(
-            axis_off=False,
-            cmap="Reds",
-            fig_height=None,
-            fig_width=8,
-            show=True,
-            save=True,
-            extent="tight",
+            axis_off=False, cmap="Reds", show=True, save=True, extent="tight"
         )
 
 
