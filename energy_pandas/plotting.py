@@ -30,18 +30,18 @@ def save_and_show(
     """Save a figure to disk and show it, as specified.
 
     Args:
-        fig (matplotlib.figure.Figure): the figure
-        ax (matplotlib.axes.Axes or list(matplotlib.axes.Axes)): the axes
-        save (bool): whether to save the figure to disk or not
-        show (bool): whether to display the figure or not
+        fig (matplotlib.figure.Figure): the figure.
+        ax (matplotlib.axes.Axes or list(matplotlib.axes.Axes)): the axes.
+        save (bool): whether to save the figure to disk or not.
+        show (bool): whether to display the figure or not.
         close (bool): close the figure (only if show equals False) to prevent
-            display
-        filename (string): the name of the file to save
+            display.
+        filename (string): the name of the file to save.
         file_format (string): the format of the file to save (e.g., 'jpg',
-            'png', 'svg')
-        dpi (int): the resolution of the image file if saving (Dots per inch)
+            'png', 'svg').
+        dpi (int): the resolution of the image file if saving (Dots per inch).
         axis_off (bool): if True matplotlib axis was turned off by plot_graph so
-            constrain the saved figure's extent to the interior of the axis
+            constrain the saved figure's extent to the interior of the axis.
         extent (str or `.Bbox`): Bounding box in inches: only the given portion of
             the figure is saved.  If 'tight', try to figure out the tight bbox of
             the figure.
@@ -109,23 +109,19 @@ def save_and_show(
 
 
 def _plot_poly_collection(
-    ax, verts, zs=None, color=None, cmap=None, vmin=None, vmax=None, **kwargs
+    ax, verts, zs=None, cmap=None, vmin=None, vmax=None, **kwargs
 ):
     """
     Args:
         ax:
         verts:
         zs:
-        color:
         cmap:
         vmin:
         vmax:
         **kwargs:
     """
     from matplotlib.collections import PolyCollection
-
-    if color is not None:
-        kwargs["color"] = color
 
     poly = PolyCollection(verts, **kwargs)
     if zs is not None:
