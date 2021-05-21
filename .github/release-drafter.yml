@@ -33,6 +33,7 @@ version-resolver:
       - 'bug'
       - 'patch'
       - 'refactoring'
+      - 'documentation'
   default: patch
 template: |
   ## Changes
