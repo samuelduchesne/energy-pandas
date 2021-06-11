@@ -681,7 +681,7 @@ class EnergySeries(Series):
         vmin=None,
         vmax=None,
         vcenter=None,
-        axis_off=True,
+        axis_off=False,
         cmap="RdBu",
         figsize=None,
         show=True,
@@ -689,13 +689,13 @@ class EnergySeries(Series):
         close=False,
         dpi=300,
         file_format="png",
-        colorbar=None,
+        colorbar=True,
         ax=None,
         filename="untitled",
         extent="tight",
         xlabel=None,
         ylabel=None,
-        ax_title=None,
+        ax_title=True,
         **kwargs,
     ):
         """Plot rectangular data as a color-encoded 2d-matrix.
@@ -729,7 +729,8 @@ class EnergySeries(Series):
                 the figure.
             ylabel (str): Set the label for the y-axis.
             xlabel (str): Set the label for the x-axis.
-            ax_title (str): Title to use for the ax.
+            ax_title (bool or str): Title to use for the ax. If True, the Series name
+                is used.
             **kwargs: Options to pass to matplotlib imshow method.
 
         Returns:
@@ -1025,12 +1026,12 @@ class EnergyDataFrame(DataFrame):
 
     def plot2d(
         self,
-        subplots=False,
+        subplots=True,
         periodlength=None,
         vmin=None,
         vmax=None,
         vcenter=None,
-        axis_off=True,
+        axis_off=False,
         cmap="RdBu",
         figsize=None,
         show=True,
@@ -1038,7 +1039,7 @@ class EnergyDataFrame(DataFrame):
         close=False,
         dpi=300,
         file_format="png",
-        colorbar=None,
+        colorbar=True,
         ax=None,
         filename="untitled",
         extent="tight",
