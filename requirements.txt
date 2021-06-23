@@ -5,4 +5,4 @@ numpy~=1.20.3
 matplotlib>=3.2  # because of TwoSlopesNorm
 scikit-learn~=0.24.2
 tsam~=1.1.0
-pandas~=1.2.4  # because of io.common methods
+pandas~=1.2.5  # because of io.common methods
