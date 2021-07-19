@@ -968,7 +968,7 @@ class EnergyDataFrame(DataFrame):
         else:
             raise TypeError(f"Unit of type {type(value)}")
 
-    def to_units(self, to_units=None, inplace=False):
+    def to_units(self, to_units, inplace=False):
         """Returns the multiplier to convert units.
 
         Args:
@@ -989,11 +989,16 @@ class EnergyDataFrame(DataFrame):
 
         """
         cdata = self.apply(
-            lambda col: unit_registry.Quantity(col.values, col.units).to(to_units)
+            lambda col: unit_registry.Quantity(col.values, col.units).to(to_units).m
         )
         if inplace:
             self[:] = cdata.values
-            self.units = {col: u for col, u in zip(self.columns, cdata.units.values())}
+            self.units = {
+                col: u
+                for col, u in zip(
+                    self.columns, [unit_registry.Unit(to_units)] * len(self.columns)
+                )
+            }
         else:
             # create new instance using constructor
             result = self._constructor(
@@ -1002,7 +1007,10 @@ class EnergyDataFrame(DataFrame):
             # Copy metadata over
             result.__finalize__(self)
             result.units = {
-                col: u for col, u in zip(self.columns, cdata.units.values())
+                col: u
+                for col, u in zip(
+                    self.columns, [unit_registry.Unit(to_units)] * len(self.columns)
+                )
             }
             return result
 
