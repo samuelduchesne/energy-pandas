@@ -7,8 +7,7 @@ import time
 from matplotlib import cm
 from matplotlib import pyplot as plt
 from matplotlib.colors import LightSource
-from numpy import ndarray
-from numpy.core._asarray import asarray
+from numpy import asarray, ndarray
 from pandas.plotting._matplotlib.tools import create_subplots, flatten_axes
 
 logger = logging.getLogger(__name__)
