@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.8, 3.9, 3.10]
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
@@ -39,7 +39,7 @@ jobs:
       run: |
         pytest --cov=energy-pandas --cov-report=xml tests/
     - name: Upload coverage to Codecov
-      if: ${{ matrix.python-version == 3.7 }}
+      if: ${{ matrix.python-version == 3.8 }}
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
