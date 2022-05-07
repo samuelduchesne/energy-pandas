@@ -70,7 +70,12 @@ class EnergySeries(Series):
     def _constructor_expanddim(self):
         def f(*args, **kwargs):
             # adapted from https://github.com/pandas-dev/pandas/issues/19850#issuecomment-367934440
-            return EnergyDataFrame(*args, **kwargs).__finalize__(self, method="inherit")
+
+            finalize__ = EnergyDataFrame(*args, **kwargs).__finalize__(
+                self, method="inherit"
+            )
+            finalize__.units = {self.name: self.units}
+            return finalize__
 
         f._get_axis_number = super(EnergySeries, self)._get_axis_number
 
