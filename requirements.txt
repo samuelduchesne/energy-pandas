@@ -3,6 +3,6 @@ pint~=0.19
 tabulate~=0.8.9
 numpy  # No special version needed
 matplotlib>=3.2  # because of TwoSlopesNorm
-scikit-learn~=1.0.2
+scikit-learn~=1.1.0
 tsam~=2.0.1
 pandas>=1.4  # because of io.common methods
