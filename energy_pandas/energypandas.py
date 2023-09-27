@@ -147,11 +147,12 @@ class EnergySeries(Series):
             for name in other._metadata:
                 if name == "units":
                     if isinstance(other, EnergyDataFrame):
-                        if len(set(getattr(other, "units").values())) == 1:
+                        if len(set(getattr(other, "units", {}).values())) == 1:
                             # if all the same units
                             setattr(self, name, *set(getattr(other, "units").values()))
                         else:
-                            setattr(self, name, getattr(other, "units").get(self.name))
+                            setattr(self, name, getattr(other, "units", {}
+                                                        ).get(self.name))
                     else:
                         setattr(self, name, getattr(other, "units"))
                 elif name == "name":
@@ -852,11 +853,7 @@ class EnergyDataFrame(DataFrame):
     @property
     def _constructor_sliced(self):
         # return EnergySeries
-        def f(*args, **kwargs):
-            # adapted from https://github.com/pandas-dev/pandas/issues/13208#issuecomment-326556232
-            return EnergySeries(*args, **kwargs).__finalize__(self, method="inherit")
-
-        return f
+        return EnergySeries
 
     def __init__(
         self,
