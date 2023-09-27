@@ -1,8 +1,8 @@
 outdated~=0.2.1
-pint~=0.19
+pint<=0.19
 tabulate~=0.8.9
 numpy  # No special version needed
 matplotlib>=3.2  # because of TwoSlopesNorm
-scikit-learn~=1.0.2
-tsam~=2.0.1
+scikit-learn # No special version needed
+tsam
 pandas>=1.4  # because of io.common methods
