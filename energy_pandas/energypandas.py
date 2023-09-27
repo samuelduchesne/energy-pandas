@@ -534,6 +534,8 @@ class EnergySeries(Series):
                 y = z.index.values
 
                 x, y = meshgrid(x, y)
+                # Remove edgecolors from kwargs
+                kwargs.pop("edgecolors", None)
                 _plot_surface(ax, x, y, z.values, cmap=cmap, **kwargs)
             elif kind == "contour":
                 import tsam.timeseriesaggregation as tsam

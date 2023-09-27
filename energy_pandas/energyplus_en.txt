@@ -44,7 +44,6 @@ ach = dimensionless  # Air Changes per Hour
 acr = 1 / hour  # Air change rate
 kBtuh = 1000 * Btu * hour
 footcandle = 1 * lumen / ft2 = fc = ft-c
-ton-hrs = 1 * ton_of_refrigeration * hour
 
 # override
 degree_Celsius = kelvin; offset: 273.15 = °C = celsius = degC = degreeC = C  # necessary to override Coulomb C
