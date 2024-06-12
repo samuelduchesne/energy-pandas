@@ -144,12 +144,12 @@ def _plot_surface(ax, x, y, z, cmap=None, **kwargs):
         **kwargs:
     """
     if cmap is None:
-        cmap = cm.gist_earth
+        cmap = plt.get_cmap("gist_earth")
 
     ls = LightSource(270, 45)
     # To use a custom hillshading mode, override the built-in shading and pass
     # in the rgb colors of the shaded surface calculated from "shade".
-    rgb = ls.shade(z, cmap=cm.get_cmap(cmap), vert_exag=0.1, blend_mode="soft")
+    rgb = ls.shade(z, cmap=plt.get_cmap(cmap), vert_exag=0.1, blend_mode="soft")
     surf = ax.plot_surface(
         x,
         y,
