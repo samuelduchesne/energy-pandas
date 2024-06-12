@@ -549,6 +549,8 @@ class EnergySeries(Series):
                 y = z.index.values
 
                 x, y = meshgrid(x, y)
+                # Remove edgecolors from kwargs
+                kwargs.pop("edgecolors", None)
                 ax.contour3D(x, y, z.values, 150, cmap=cmap, **kwargs)
             else:
                 raise NameError('plot kind "{}" is not supported'.format(kind))
@@ -820,6 +822,7 @@ RESOLUTION_NAME = dict(
     D="Days",
     H="Hours",
     T="Minutes",
+    MIN="Minutes",
     S="Seconds",
     L="Milliseconds",
     U="Microseconds",
