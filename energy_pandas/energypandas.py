@@ -1112,8 +1112,8 @@ class EnergyDataFrame(DataFrame):
         if self.values.ndim == 1:
             return 1
         else:
-            x, *_ = self.values.shape
-            return int(x)
+            _, cols, *_ = self.values.shape
+            return int(cols)
 
     def discretize_tsam(self, inplace: bool = False, **kwargs) -> EnergyDataFrame:
         """Clusters time series data to typical periods.
