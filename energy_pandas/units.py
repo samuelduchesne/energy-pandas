@@ -1,16 +1,17 @@
 """units module."""
 
+from pathlib import Path
+
 # Units
 from tokenize import TokenInfo
 
 import pint
-import pkg_resources
-from pint.compat import tokenizer
+from pint.pint_eval import tokenizer
 
-energyplus_registry = pkg_resources.resource_filename(__name__, "energyplus_en.txt")
+energyplus_registry = Path(__file__).parent / "energyplus_en.txt"
 
 
-def underline_dash(input_string):
+def underline_dash(input_string: str) -> str:
     """Enclose denominator with parentheses."""
     parts = []
     gen = tokenizer(input_string)
@@ -18,23 +19,19 @@ def underline_dash(input_string):
         parts.append(part)
         if part.string == "/":
             # put rest of string in parentheses
-            parts.append(
-                TokenInfo(type=53, string="(", start=(1, 0), end=(1, 1), line="(")
-            )
+            parts.append(TokenInfo(type=53, string="(", start=(1, 0), end=(1, 1), line="("))
             parts.extend(list(gen))
-            parts.append(
-                TokenInfo(type=53, string=")", start=(1, 0), end=(1, 1), line="(")
-            )
-    return "".join((s.string for s in parts))
+            parts.append(TokenInfo(type=53, string=")", start=(1, 0), end=(1, 1), line="("))
+    return "".join(s.string for s in parts)
 
 
-def dash_to_mul(input_string):
+def dash_to_mul(input_string: str) -> str:
     """Replace '-' with '*' in input_string."""
     return input_string.replace("-", "*")
 
 
 class Token:
-    def __init__(self, input_string):
+    def __init__(self, input_string: str):
         self.string = input_string
 
 
@@ -49,9 +46,7 @@ IP_DEFAULT_CONVERSION = {
     unit_registry.parse_units("kW"): unit_registry.parse_units("kBtuh/h"),
     unit_registry.parse_units("m2"): unit_registry.parse_units("ft2"),
     unit_registry.parse_units("m3"): unit_registry.parse_units("ft3"),
-    unit_registry.parse_units("(kg/s)/W"): unit_registry.parse_units(
-        "(lbm/sec)/(Btu/hr)"
-    ),
+    unit_registry.parse_units("(kg/s)/W"): unit_registry.parse_units("(lbm/sec)/(Btu/hr)"),
     unit_registry.parse_units("1/K"): unit_registry.parse_units("1/F"),
     unit_registry.parse_units("1/m"): unit_registry.parse_units("1/ft"),
     unit_registry.parse_units("A/K"): unit_registry.parse_units("A/F"),
@@ -111,9 +106,7 @@ IP_DEFAULT_CONVERSION = {
     unit_registry.parse_units("m3/GJ"): unit_registry.parse_units("ft3/MWh"),
     unit_registry.parse_units("m3/hr"): unit_registry.parse_units("ft3/hr"),
     unit_registry.parse_units("m3/hr-m2"): unit_registry.parse_units("ft3/hr-ft2"),
-    unit_registry.parse_units("m3/hr-person"): unit_registry.parse_units(
-        "ft3/hr-person"
-    ),
+    unit_registry.parse_units("m3/hr-person"): unit_registry.parse_units("ft3/hr-person"),
     unit_registry.parse_units("m3/kg"): unit_registry.parse_units("ft3/lb"),
     unit_registry.parse_units("m3/m2"): unit_registry.parse_units("ft3/ft2"),
     unit_registry.parse_units("m3/MJ"): unit_registry.parse_units("ft3/kWh"),
@@ -121,9 +114,7 @@ IP_DEFAULT_CONVERSION = {
     unit_registry.parse_units("m3/s"): unit_registry.parse_units("ft3/min"),
     unit_registry.parse_units("m3/s-m"): unit_registry.parse_units("ft3/min-ft"),
     unit_registry.parse_units("m3/s-m2"): unit_registry.parse_units("ft3/min-ft2"),
-    unit_registry.parse_units("m3/s-person"): unit_registry.parse_units(
-        "ft3/min-person"
-    ),
+    unit_registry.parse_units("m3/s-person"): unit_registry.parse_units("ft3/min-person"),
     unit_registry.parse_units("m3/s-W"): unit_registry.parse_units("(ft3/min)/(Btu/h)"),
     unit_registry.parse_units("N-m"): unit_registry.parse_units("lbf-in"),
     unit_registry.parse_units("N-s/m2"): unit_registry.parse_units("lbf-s/ft2"),
