@@ -1,11 +1,13 @@
 """EnergySeries module."""
 
+from __future__ import annotations
+
 import contextlib
 import copy
 import logging
 import warnings
 from datetime import timedelta
-from typing import ClassVar, Tuple, Type, Union
+from typing import ClassVar
 
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -832,7 +834,7 @@ class EnergyDataFrame(DataFrame):
     _metadata: ClassVar[list[str]] = ["units", "name"]
 
     @property
-    def _constructor(self) -> Type["EnergyDataFrame"]:
+    def _constructor(self) -> type[EnergyDataFrame]:
         return EnergyDataFrame
 
     @property
@@ -900,7 +902,7 @@ class EnergyDataFrame(DataFrame):
         normalize=False,
         sort_values=False,
         to_units=None,
-    ) -> "EnergyDataFrame":
+    ) -> EnergyDataFrame:
         """From a ReportData DataFrame"""
         # get data
         units = [units] if units else set(df.Units)
@@ -955,7 +957,7 @@ class EnergyDataFrame(DataFrame):
             msg = f"Unit of type {type(value)}"
             raise TypeError(msg)
 
-    def to_units(self, to_units: str | Unit, inplace: bool = False) -> Union["EnergyDataFrame", None]:
+    def to_units(self, to_units: str | Unit, inplace: bool = False) -> EnergyDataFrame | None:
         """Returns the multiplier to convert units.
 
         Args:
@@ -988,7 +990,7 @@ class EnergyDataFrame(DataFrame):
             result.units = dict(zip(self.columns, [unit_registry.Unit(to_units)] * len(self.columns)))
             return result
 
-    def normalize(self, inplace: bool = False) -> Union["EnergyDataFrame", None]:
+    def normalize(self, inplace: bool = False) -> EnergyDataFrame | None:
         x = self.values  # returns a numpy array
         min_max_scaler = preprocessing.MinMaxScaler()
         x_scaled = min_max_scaler.fit_transform(x)
@@ -1030,7 +1032,7 @@ class EnergyDataFrame(DataFrame):
         layout_type="vertical",
         fig_title=None,
         **kwargs,
-    ) -> Tuple[Figure, Union[Axes, ndarray]]:
+    ) -> tuple[Figure, Axes | ndarray]:
         """Plot rectangular data as a (or multiple) color-encoded 2d-matrix.
 
         Args:
@@ -1113,7 +1115,7 @@ class EnergyDataFrame(DataFrame):
             x, *_ = self.values.shape
             return int(x)
 
-    def discretize_tsam(self, inplace: bool = False, **kwargs) -> "EnergyDataFrame":
+    def discretize_tsam(self, inplace: bool = False, **kwargs) -> EnergyDataFrame:
         """Clusters time series data to typical periods.
 
         See :class:`tsam.timeseriesaggregation.TimeSeriesAggregation` for more info.
