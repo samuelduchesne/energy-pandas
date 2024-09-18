@@ -1,10 +1,11 @@
 """Plotting module."""
 
+from __future__ import annotations
+
 import logging
 import os
 import time
 
-from matplotlib import cm
 from matplotlib import pyplot as plt
 from matplotlib.colors import LightSource
 from numpy import asarray, ndarray
@@ -15,17 +16,17 @@ log = logger.info
 
 
 def save_and_show(
-    fig,
-    ax=None,
-    save=False,
-    show=True,
-    close=False,
-    filename="untitled",
-    file_format="png",
-    dpi=300,
-    axis_off=False,
-    extent="extent",
-):
+    fig: plt.Figure,
+    ax: plt.Axes | list[plt.Axes] | None = None,
+    save: bool = False,
+    show: bool = True,
+    close: bool = False,
+    filename: str = "untitled",
+    file_format: str = "png",
+    dpi: int = 300,
+    axis_off: bool = False,
+    extent: str | plt.Bbox = "extent",
+) -> tuple[plt.Figure, plt.Axes | list[plt.Axes]]:
     """Save a figure to disk and show it, as specified.
 
     Args:
@@ -58,8 +59,8 @@ def save_and_show(
         if not isinstance(ax, (ndarray, list)):
             ax = [ax]
         if file_format == "svg":
-            for ax in ax:
-                ax.patch.set_alpha(0.0)
+            for axx in ax:
+                axx.patch.set_alpha(0.0)
             fig.patch.set_alpha(0.0)
             fig.savefig(
                 path_filename,
@@ -72,12 +73,10 @@ def save_and_show(
             if extent is None:
                 if len(ax) == 1:
                     if axis_off:
-                        for ax in ax:
+                        for axx in ax:
                             # if axis is turned off, constrain the saved
                             # figure's extent to the interior of the axis
-                            extent = ax.get_window_extent().transformed(
-                                fig.dpi_scale_trans.inverted()
-                            )
+                            extent = axx.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
                 else:
                     extent = "tight"
             fig.savefig(
@@ -88,18 +87,14 @@ def save_and_show(
                 facecolor=fig.get_facecolor(),
                 transparent=True,
             )
-        log(
-            "Saved the figure to disk in {:,.2f} seconds".format(
-                time.time() - start_time
-            )
-        )
+        log(f"Saved the figure to disk in {time.time() - start_time:,.2f} seconds")
 
     # show the figure if specified
     if show:
         start_time = time.time()
         plt.show()
         # fig.show()
-        log("Showed the plot in {:,.2f} seconds".format(time.time() - start_time))
+        log(f"Showed the plot in {time.time() - start_time:,.2f} seconds")
     # if show=False, close the figure if close=True to prevent display
     elif close:
         plt.close()
@@ -107,19 +102,7 @@ def save_and_show(
     return fig, ax
 
 
-def _plot_poly_collection(
-    ax, verts, zs=None, cmap=None, vmin=None, vmax=None, **kwargs
-):
-    """
-    Args:
-        ax:
-        verts:
-        zs:
-        cmap:
-        vmin:
-        vmax:
-        **kwargs:
-    """
+def _plot_poly_collection(ax, verts, zs=None, cmap=None, vmin=None, vmax=None, **kwargs):
     from matplotlib.collections import PolyCollection
 
     poly = PolyCollection(verts, **kwargs)

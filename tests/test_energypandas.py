@@ -1,3 +1,5 @@
+from typing import ClassVar, List, Tuple
+
 import pytest
 from numpy.testing import assert_almost_equal
 from pandas import date_range
@@ -5,10 +7,12 @@ from pandas import date_range
 from energy_pandas import EnergyDataFrame, EnergySeries
 from energy_pandas.units import dash_to_mul, underline_dash, unit_registry
 
+UNITDEF = List[Tuple[str, str, str]]
+
 
 @pytest.fixture()
 def edf():
-    frame = EnergyDataFrame({"Temp": range(0, 100)}, units="C", extrameta="this")
+    frame = EnergyDataFrame({"Temp": range(0, 100)}, units="C", extrameta="this", dtype="float")
     yield frame
 
     # check that the name is passed to the slice
@@ -39,13 +43,11 @@ def edf_from_e_series():
 @pytest.fixture()
 def es():
     datetimeindex = date_range(
-        freq="H",
+        freq="h",
         start="{}-01-01".format("2018"),
         periods=100,
     )
-    series = EnergySeries(
-        range(0, 100), index=datetimeindex, name="Temp", units="C", extrameta="this"
-    )
+    series = EnergySeries(range(0, 100), index=datetimeindex, name="Temp", units="C", extrameta="this", dtype="float")
     yield series
 
     # check that the name is passed to the slice
@@ -145,7 +147,7 @@ class TestEnergySeries:
             kind=kind,
             axis_off=False,
             cmap="Reds",
-            show=True,
+            show=False,
             save=True,
             edgecolors="grey",
             linewidths=0.01,
@@ -156,7 +158,7 @@ class TestEnergySeries:
             figsize=(8, 1),
             axis_off=True,
             cmap="Reds",
-            show=True,
+            show=False,
             save=False,
             colorbar=True,
             filename=es.name + "_heatmap",
@@ -186,9 +188,7 @@ class TestEnergyDataFrame:
         """Check that units are kept on slices."""
         assert edf_from_e_series["Series 1 degC"].extrameta == "this"
         assert edf_from_e_series["Series 1 degC"].units == unit_registry.degC
-        assert edf_from_e_series[["Series 1 degC"]].units == {
-            "Series 1 degC": unit_registry.degC
-        }
+        assert edf_from_e_series[["Series 1 degC"]].units == {"Series 1 degC": unit_registry.degC}
 
     def test_mixed_units_ops(self, edf_from_e_series):
         col_1 = edf_from_e_series.iloc[:, 0]
@@ -261,18 +261,15 @@ class TestEnergyDataFrame:
 
         es = EnergySeries(
             np.random.randint(12, 36, size=(365 * 24 * 4,)),
-            index=date_range("2018-01-01", periods=365 * 24 * 4, freq="15T"),
+            index=date_range("2018-01-01", periods=365 * 24 * 4, freq="15min"),
             units="degC",
         )
-        fig, ax = es.plot2d(
-            axis_off=False, cmap="Reds", show=True, save=True, extent="tight"
-        )
+        fig, ax = es.plot2d(axis_off=False, cmap="Reds", show=False, save=True, extent="tight")
 
 
 class TestUnits:
-
     # (Quantity, unit, abbreviation)
-    ENERGYPLUS_UNITS = [
+    ENERGYPLUS_UNITS: ClassVar[UNITDEF] = [
         ("angular degrees", "degree", "deg"),
         ("Length", "meter", "m"),
         ("Area", "square meter", "m2"),
@@ -312,7 +309,7 @@ class TestUnits:
         ("thermal gradient coeff for moisture capacity", "——-", "kg/kg-K"),
         ("isothermal moisture capacity", "——-", "m3/kg"),
     ]
-    ENERGYPLUS_UNITS_NAMES = [unit for _, _, unit in ENERGYPLUS_UNITS]
+    ENERGYPLUS_UNITS_NAMES: ClassVar[List[UNITDEF]] = [unit for _, _, unit in ENERGYPLUS_UNITS]
 
     def test_underline_dash(self):
         assert underline_dash("W/m-K") == "W/(m-K)"
