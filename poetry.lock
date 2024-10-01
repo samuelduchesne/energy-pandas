@@ -1745,12 +1745,13 @@ telegram = ["requests"]
 
 [[package]]
 name = "tsam"
-version = "2.3.3"
+version = "2.3.5"
 description = "Time series aggregation module (tsam) to create typical periods"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "tsam-2.3.3.tar.gz", hash = "sha256:1a818164dbd4bbeded3f209c82d2644666ead03c430b128963e13dab68892069"},
+    {file = "tsam-2.3.5-py3-none-any.whl", hash = "sha256:871bf76885c7b8a75ed96404f183953f2d4bccf49cedc074b55fc9495d913f0a"},
+    {file = "tsam-2.3.5.tar.gz", hash = "sha256:c6c1ce8814c0e21e424f0deeddf82b863f01b1eae39a3f46ec42accefa041dc0"},
 ]
 
 [package.dependencies]
