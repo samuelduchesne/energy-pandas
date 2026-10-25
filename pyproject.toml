@@ -26,6 +26,8 @@ outdated = "^0.2.2"
 tsam = "^2.3.3"
 
 [tool.poetry.group.dev.dependencies]
+# Transitive via matplotlib; pins the patched release for GHSA-58r4-6rv3-gfh8 (needs Python >= 3.11).
+pillow = {version = ">=13.0.0", python = ">=3.11"}
 pytest = ">=7.2,<9.0"
 pytest-cov = ">=4,<6"
 mypy = "^1.5.1"
